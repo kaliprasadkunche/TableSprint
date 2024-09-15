@@ -13,11 +13,18 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
+// const db = mysql2.createConnection({
+//     host: 'localhost',
+//     user: 'root',
+//     password: 'Kali659600',
+//     database: 'tablesprint' 
+// });
+
 const db = mysql2.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'Kali659600',
-    database: 'tablesprint' 
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 db.connect((err) => {
@@ -32,6 +39,18 @@ db.connect((err) => {
 const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
+
+// Create categories table if it does not exist
+const createUsersTable = `
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL
+)
+`;
+db.query(createUsersTable, (err) => {
+  if (err) console.error('Error creating table:', err);
+});
 
 // Register User Endpoint
 app.post('/register', (req, res) => {
