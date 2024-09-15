@@ -40,6 +40,18 @@ const createToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
+// Create categories table if it does not exist
+const createUsersTable = `
+CREATE TABLE IF NOT EXISTSusers (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(255) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL
+)
+`;
+db.query(createUsersTable, (err) => {
+  if (err) console.error('Error creating table:', err);
+});
+
 // Register User Endpoint
 app.post('/register', (req, res) => {
   const { email, password } = req.body;
